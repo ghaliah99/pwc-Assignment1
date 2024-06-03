@@ -1,0 +1,7 @@
+Flask==1.1.2
+langchain==0.2.1
+langchain_community==0.2.1
+langchain_openai==0.1.8
+nltk==3.7
+replicate==0.26.0
+rouge_score==0.1.2

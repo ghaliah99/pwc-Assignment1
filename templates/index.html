@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Comparison UAE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        #query {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fafafa;
+            transition: transform 0.3s;
+            cursor: pointer;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .response:hover {
+            transform: scale(1.05);
+            white-space: normal;
+        }
+        .loading {
+            font-style: italic;
+            color: #007bff;
+        }
+        .best-model {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RAG Comparison on UAE Web Data</h1>
+        <form id="queryForm">
+            <label for="query">Ask me Somrthing:</label><br>
+            <input type="text" id="query" name="query" required><br><br>
+            <input type="submit" value="Submit">
+        </form>
+        <div id="responses"></div>
+        <div id="bestModel" class="best-model"></div>
+    </div>
+
+    <script>
+      document.getElementById('queryForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const query = document.getElementById('query').value;
+
+            const responsesDiv = document.getElementById('responses');
+            const bestModelDiv = document.getElementById('bestModel');
+            responsesDiv.innerHTML = '<div class="response loading">Loading...</div>';
+            bestModelDiv.innerHTML = '';
+
+            fetch('/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ 'query': query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                responsesDiv.innerHTML = '';
+                for (const [model, response] of Object.entries(data)) {
+                    if (model !== "Best Model") {
+                        const responseDiv = document.createElement('div');
+                        responseDiv.className = 'response';
+                        responseDiv.innerHTML = `<strong>${model}:</strong> ${response}`;
+                        responsesDiv.appendChild(responseDiv);
+                    } else {
+                        bestModelDiv.innerHTML = response;
+                    }
+                }
+            })
+            .catch(error => {
+                responsesDiv.innerHTML = '<div class="response">An error occurred. Please try again.</div>';
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
